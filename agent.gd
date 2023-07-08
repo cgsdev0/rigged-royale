@@ -2,10 +2,15 @@ extends Node3D
 
 var color = Color.HOT_PINK
 var squad = 0
+var pid = 0
 
 enum State {
 	IDLE,
-	REGROUPING
+	REGROUPING,
+	LOOTING,
+	ENGAGING,
+	FLEEING,
+	CIRCLE
 }
 var state = State.IDLE
 
@@ -18,10 +23,18 @@ var loot = 0.0
 # traits
 var regroup_timer_max
 var min_peer_dist
+var loot_goblin
+var loot_speed
+var groupiness
+var greed
 
 func roll_traits():
 	regroup_timer_max = randf_range(4.3, 6.2)
 	min_peer_dist = randf_range(2.0, 10.0)
+	loot_goblin = randf_range(30.0, 90.0)
+	loot_speed = randf_range(0.8, 1.2)
+	greed = randf_range(0.3, 0.8)
+	groupiness = randf_range(0.3, 0.6)
 	
 func on_assign():
 	roll_traits()
@@ -37,9 +50,26 @@ func plot_course(target):
 func pick_new_state():
 	if regroup_timer > regroup_timer_max && state == State.REGROUPING:
 		return State.IDLE
-	if min_peer_distance() > min_peer_dist:
-		return State.REGROUPING
-	return State.IDLE
+		
+	var desires = []
+	# calculate desires
+	var md = min_peer_distance()
+	if md > min_peer_dist:
+		desires.push_back([min(md / min_peer_dist * groupiness, 0.5), State.REGROUPING])
+	
+	if loot < loot_goblin:
+		desires.push_back([(loot_goblin - loot) / loot_goblin * greed, State.LOOTING])
+	# choose a desire
+	var max = 0
+	var chosen = State.IDLE
+	for desire in desires:
+		if desire[0] > max:
+			max = desire[0]
+			chosen = desire[1]
+			
+	if chosen == State.IDLE:
+		print("Agent ", pid, " is stupid as fuck")
+	return chosen
 	
 func min_peer_distance():
 	var peers = get_tree().get_nodes_in_group("squad" + str(squad))
@@ -56,6 +86,21 @@ func min_peer_distance():
 	if peers_counted == 0:
 		return 0
 	return min
+
+func find_nearby_loot():
+	var min = 1000000.0
+	var target = null
+	for l in get_tree().get_nodes_in_group("loot"):
+		var d = l.global_position.distance_to(global_position) - l.radius
+		if d < min:
+			min = d
+			target = l
+	
+	if !target:
+		return target
+	var r = randf_range(0.0, target.radius)
+	var theta = randf_range(0.0, 2 * PI)
+	return target.global_position + Vector3(cos(theta) * r, 0.0, sin(theta) * r)
 	
 func find_squad_center():
 	var peers = get_tree().get_nodes_in_group("squad" + str(squad))
@@ -70,6 +115,14 @@ func find_squad_center():
 	if peers_counted == 0:
 		return null
 	return avg / peers_counted
+	
+func within_loot_area():
+	var xy = Vector2(global_position.x, global_position.z)
+	for l in get_tree().get_nodes_in_group("loot"):
+		var lxy = Vector2(l.global_position.x, global_position.z)
+		if xy.distance_squared_to(lxy) <= l.radius * l.radius:
+			return true
+	return false
 	
 func _physics_process(delta):
 	if global_position.x > 512.0:
@@ -91,12 +144,18 @@ func _physics_process(delta):
 	match state:
 		State.REGROUPING:
 			regroup_timer += delta
+		State.LOOTING:
+			if within_loot_area():
+				loot = min(loot + delta, 100.0)
 		
 	# do things on transitions
 	match [prev_state, state]:
 		[State.IDLE, State.REGROUPING]:
 			regroup_timer = 0.0
 			plot_course(find_squad_center())
+		[State.IDLE, State.LOOTING]:
+			print("Agent ", pid, " would like to loot")
+			plot_course(find_nearby_loot())
 			
 		
 	if state == State.IDLE || $NavigationAgent3D.is_navigation_finished():

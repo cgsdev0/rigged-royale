@@ -33,7 +33,7 @@ func rgb(r,g,b):
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	#self.call_deferred("spawn_pois")
+	self.call_deferred("spawn_pois")
 #	return
 	self.call_deferred("spawn")
 	
@@ -46,6 +46,7 @@ func spawn_pois():
 		cyl.height = 50.0
 		get_parent().add_child(cyl)
 		cyl.global_position = poi.p
+		cyl.add_to_group("loot")
 		
 func assign_squad(p, i):
 	p.squad = i
@@ -56,6 +57,7 @@ func spawn():
 	var player_scene = preload("res://player.tscn")
 	for i in range(100):
 		var p = player_scene.instantiate()
+		p.pid = i
 		get_parent().add_child(p)
 		var idx = randi_range(0, $%NavigationRegion3D.navigation_mesh.get_polygon_count())
 		var v = $%NavigationRegion3D.navigation_mesh.get_vertices()[$%NavigationRegion3D.navigation_mesh.get_polygon(idx)[1]]
