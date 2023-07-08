@@ -8,13 +8,13 @@ extends Node3D
 
 var height_data = {}
 var normal_data = {}
-var terrain_amplitude = 60
+var terrain_amplitude = 100
 
 var vertices = PackedVector3Array()
 var uvs = PackedVector2Array()
 var normals = PackedVector3Array()
 
-var water_height = 29.6
+var water_height = 49.3
 
 var st = ImmediateMesh.new()
 
@@ -46,7 +46,7 @@ func create_mesh():
 		if x % mesh_resolution == 0:
 			for y in range(height - mesh_resolution):
 				if y % mesh_resolution == 0:
-					create_quad(x, y)
+					create_quad(x, y, width)
 					
 	st.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
 	
@@ -57,9 +57,11 @@ func create_mesh():
 	
 	st.surface_end()
 	my_mesh = st
+	var mat = preload("res://materials/map.tres")
+	my_mesh.surface_set_material(0, mat)
 	mesh_container.set_mesh(my_mesh)
 
-func create_quad(x, y):
+func create_quad(x, y, s):
 	# triangle 1
 	var vert1 = Vector3(x, height_data[Vector2(x,y)], -y)
 	var vert2 = Vector3(x, height_data[Vector2(x, y + mesh_resolution)], (-y - mesh_resolution))
@@ -69,9 +71,9 @@ func create_quad(x, y):
 	vertices.push_back(vert2)
 	vertices.push_back(vert3)
 
-	uvs.push_back(Vector2(vert1.x, -vert1.z))
-	uvs.push_back(Vector2(vert2.x, -vert2.z))
-	uvs.push_back(Vector2(vert3.x, -vert3.z))
+	uvs.push_back(Vector2(vert1.x / s, -vert1.z / s))
+	uvs.push_back(Vector2(vert2.x / s, -vert2.z / s))
+	uvs.push_back(Vector2(vert3.x / s, -vert3.z / s))
 	
 	normals.push_back(c_to_v(normal_data[Vector2(x,y)]))
 	normals.push_back(c_to_v(normal_data[Vector2(x, y + mesh_resolution)]))
@@ -86,9 +88,9 @@ func create_quad(x, y):
 	vertices.push_back(vert2)
 	vertices.push_back(vert3)
 	
-	uvs.push_back(Vector2(vert1.x, -vert1.z))
-	uvs.push_back(Vector2(vert2.x, -vert2.z))
-	uvs.push_back(Vector2(vert3.x, -vert3.z))
+	uvs.push_back(Vector2(vert1.x / s, -vert1.z / s))
+	uvs.push_back(Vector2(vert2.x / s, -vert2.z / s))
+	uvs.push_back(Vector2(vert3.x / s, -vert3.z / s))
 	
 	normals.push_back(c_to_v(normal_data[Vector2(x,y)]))
 	normals.push_back(c_to_v(normal_data[Vector2(x + mesh_resolution, y + mesh_resolution)]))
