@@ -81,13 +81,11 @@ func plot_course(target):
 		if "position" in result:
 			target = result.position
 		else:
-			print("BAD BAD BAD")
 			return
 			
 	# reject targets outside the wall
 	var txy = Vector2(target.x, target.z)
 	if txy.distance_to(CircleZone.ocp) >= CircleZone.ocr:
-		print("Agent ", pid, " is dumb af")
 		return
 
 	$NavigationAgent3D.target_position = target
@@ -151,7 +149,6 @@ func find_nearby_loot():
 		# ignore loot outside the circle
 		if lxy.distance_to(CircleZone.ocp) >= CircleZone.ocr:
 			l.queue_free()
-			print("FREEING")
 			continue
 		var d = l.global_position.distance_to(global_position) - l.radius
 		if d < min:
@@ -196,14 +193,14 @@ func _physics_process(delta):
 		return
 		
 	cooldown = max(0.0, cooldown - delta)
-	if global_position.x > 512.0:
-		print("HELP I AM LOST")
-	if global_position.x < 0:
-		print("HELP I AM LOST")
-	if global_position.z < -512.0:
-		print("HELP I AM LOST")
-	if global_position.z > 0:
-		print("HELP I AM LOST")
+#	if global_position.x > 512.0:
+#		print("HELP I AM LOST")
+#	if global_position.x < 0:
+#		print("HELP I AM LOST")
+#	if global_position.z < -512.0:
+#		print("HELP I AM LOST")
+#	if global_position.z > 0:
+#		print("HELP I AM LOST")
 	var SPEED = 2
 	var velocity = Vector3.ZERO
 	
