@@ -2,6 +2,7 @@
 shader_type canvas_item;
 uniform sampler2D screen_texture : hint_screen_texture, repeat_disable, filter_nearest;
 
+global uniform float crt_on;
 // Loosely based on postprocessing shader by inigo quilez, License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
 
 vec2 curve(vec2 uv)
@@ -55,12 +56,18 @@ void fragment(  )
     float comp = smoothstep( 0.1, 0.9, sin(TIME) );
  
 	// my code starts here
+	vec3 black = vec3(0.1);
+	col = mix(col, black, clamp(abs(UV.y - 0.5) * 100.0 * (1.0 - crt_on), 0.0, 1.0));
+	col = mix(col, black, pow(1.0 - crt_on, 2.0));
+	
 	float curv = pow(abs(UV.y - 0.5), 3.0) / 3.0;
-	vec3 black = vec3(0.02);
+	black = vec3(0.02);
 	col = mix(col, black, sign(UV.x - 0.99 + curv) / 2.0 + 0.5);
 	col = mix(black, col, sign(UV.x - 0.01 - curv) / 2.0 + 0.5);
 	curv = pow(abs(UV.x - 0.5), 3.0) / 3.0;
 	col = mix(col, black, sign(UV.y - 0.99 + curv) / 2.0 + 0.5);
 	col = mix(black, col, sign(UV.y - 0.01 - curv) / 2.0 + 0.5);
+	
+	
     COLOR = vec4(col,1.0);
 }

@@ -148,6 +148,7 @@ func _process(delta):
 func _physics_process(delta):
 	if !current || sticky:
 		return
+
 	var mp = get_viewport().get_mouse_position()
 	var from = project_ray_origin(mp)
 	var to = from + project_ray_normal(mp) * 1000.0
@@ -165,6 +166,7 @@ func _physics_process(delta):
 var dragging = false
 var drag_anchor
 var drag_pos
+
 func _input(event):
 	if !current:
 		return
@@ -213,6 +215,8 @@ func _input(event):
 					global_position.z = -256.0
 					return
 		elif event.button_index == MOUSE_BUTTON_LEFT:
+			if !drag_anchor || !dragging:
+				return
 			dragging = false
 			if drag_anchor.distance_to(event.position) < 5.0:
 				# click, not drag (probably lol)
@@ -228,6 +232,7 @@ func _input(event):
 				else:
 					$%UI.untrack()
 					sticky = false
+
 			# released
 			pass
 #		else:

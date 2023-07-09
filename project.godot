@@ -65,3 +65,10 @@ ui_down={
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 environment/defaults/default_clear_color=Color(0.00784314, 0.00784314, 0.00784314, 1)
+
+[shader_globals]
+
+crt_on={
+"type": "float",
+"value": 0.0
+}

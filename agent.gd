@@ -13,6 +13,7 @@ enum State {
 	CIRCLE
 }
 var state = State.IDLE
+var has_sniper = false
 
 var debouncer = 0.0
 
@@ -35,13 +36,22 @@ var innate_skill
 var loot_rate
 var tracked = false
 
+var cooldown = 0.0
+
 func fire_bullet(dist):
+	if cooldown > 0.0:
+		return false
 	if loot > 0.1:
 		loot -= 0.01
+		if has_sniper:
+			loot -= 0.05
 	else:
 		return false
 	var roll = randf_range(0.0, 100.0)
-	return roll < innate_skill * 0.1 + loot * 0.2 - dist / 3.0
+	var sniper_mod = 1.0
+	if has_sniper:
+		sniper_mod = 3.0
+	return roll < innate_skill * 0.1 + loot * 0.2 - dist / (3.0 * sniper_mod)
 	
 func roll_traits():
 	regroup_timer_max = randf_range(4.3, 6.2)
@@ -185,6 +195,7 @@ func _physics_process(delta):
 	if dead:
 		return
 		
+	cooldown = max(0.0, cooldown - delta)
 	if global_position.x > 512.0:
 		print("HELP I AM LOST")
 	if global_position.x < 0:
@@ -240,7 +251,10 @@ func _physics_process(delta):
 	for i in range(-4, 4):
 		var from = global_position
 		var to = (-global_transform.basis.z).normalized().rotated(Vector3.UP, (scan_angle - 8) / 8.0 * PI / 2.0) + Vector3(0, i / 40.0, 0)
-		to = global_position + to.normalized() * 4.0 * (loot + 0.2)
+		var sniper_mod = 1.0
+		if has_sniper:
+			sniper_mod = 2.5
+		to = global_position + to.normalized() * 4.0 * sniper_mod * (loot + 0.2)
 		var query =  PhysicsRayQueryParameters3D.create(from, to, 4 | 2, [$RigidBody3D.get_rid()])
 		query.collide_with_areas = true
 		var result = get_world_3d().direct_space_state.intersect_ray(query)
@@ -251,7 +265,11 @@ func _physics_process(delta):
 			if who.squad != squad && !who.dead:
 				var shot_dist = who.global_position.distance_to(global_position)
 				if fire_bullet(shot_dist):
-					var new_loot = who.take_damage((loot / 2.0 + 0.5) * 10.0, self.pid)
+					cooldown = 0.1
+					if has_sniper:
+						sniper_mod = 1.5
+						cooldown = 1.8
+					var new_loot = who.take_damage((loot / 4.0 + 0.5) * 10.0 * sniper_mod, self.pid)
 					if new_loot > 0.0:
 						loot = min(loot + new_loot, 100.0)
 						kills += 1

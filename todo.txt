@@ -1,15 +1,13 @@
 requirements
 ====================
-instructions
 =====================
 stretch goals
 =====================
-give sniper
-heal
 
 dust particles
 crt on effect (visual)
 
+https://github.com/cgcostume/pubg-maps
 https://poly.pizza/m/a3XrQkLNna9
 https://www.freesoundeffects.com/free-track/airplane-6-22396/
 https://freesound.org/people/LimitSnap_Creations/sounds/279004/
@@ -21,3 +19,5 @@ https://freesound.org/people/earth_cord/sounds/635915/
 https://freesound.org/people/jivatma07/sounds/76234/
 https://freesound.org/people/soundslikewillem/sounds/193972/
 https://freesound.org/people/tim.kahn/sounds/91926/
+https://freesound.org/people/colorsCrimsonTears/sounds/562292/
+https://freesound.org/people/nettimato/sounds/350347/
