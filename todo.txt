@@ -1,7 +1,6 @@
 requirements
 ====================
 instructions
-sound effects
 =====================
 stretch goals
 =====================
