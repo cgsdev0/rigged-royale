@@ -177,7 +177,7 @@ func within_loot_area():
 func random_inner_circle():
 	var r = randf_range(0.0, CircleZone.icr)
 	var theta = randf_range(0.0, 2 * PI)
-	return Vector3(CircleZone.icp.x, global_position.y, CircleZone.icp.z) + Vector3(cos(theta) * r, 0.0, sin(theta) * r)
+	return Vector3(CircleZone.icp.x, global_position.y, CircleZone.icp.y) + Vector3(cos(theta) * r, 0.0, sin(theta) * r)
 	
 func _physics_process(delta):
 	if dead:

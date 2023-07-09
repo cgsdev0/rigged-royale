@@ -32,7 +32,11 @@ func rgb(r,g,b):
 	return Color(r / 255.0, g / 255.0, b / 255.0)
 
 # Called when the node enters the scene tree for the first time.
-func _ready():
+func start_the_game():
+	current = true
+	await get_tree().create_timer(0.16).timeout
+	$%Static.visible = false
+	CircleZone.started = true
 	self.call_deferred("spawn_pois")
 #	return
 	self.call_deferred("spawn")
@@ -106,6 +110,8 @@ func pan_dist():
 	return 512.0 / size
 	
 func _process(delta):
+	if !current:
+		return
 	if !CircleZone.busy && !CircleZone.is_done_shrinking():
 		if Input.is_action_pressed("ui_left"):
 			CircleZone.icp.x += delta * 10.0
@@ -117,6 +123,8 @@ func _process(delta):
 			CircleZone.icp.y -= delta * 10.0
 			
 func _physics_process(delta):
+	if !current:
+		return
 	var mp = get_viewport().get_mouse_position()
 	var from = project_ray_origin(mp)
 	var to = from + project_ray_normal(mp) * 1000.0
@@ -136,6 +144,8 @@ var dragging = false
 var drag_anchor
 var drag_pos
 func _input(event):
+	if !current:
+		return
 	if event.is_action_pressed("ui_accept"):
 		CircleZone.close_circle()
 	if event is InputEventMouseMotion && dragging:

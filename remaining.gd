@@ -28,6 +28,13 @@ Players remaining: {0}
 Squads remaining: {1}
 Zone shrinking...
 ===================================="""
+	if !CircleZone.started:
+		fstr="""BattleOS v20.17
+====================================
+Initializing bootloader...
+Pre-heating chicken dinner...
+Awaiting players...
+===================================="""
 	text=fstr.format([get_tree().get_nodes_in_group("player").size(), CircleZone.squads_alive, ceil(CircleZone.timer)])
 
 	pass

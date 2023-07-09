@@ -187,9 +187,10 @@ signal winner_winner
 signal killed(who, by)
 	
 var timer
+var started = false
 
 func _process(delta):
-	if busy || is_done_shrinking():
+	if busy || is_done_shrinking() || !started:
 		return
 	timer -= delta
 	timer = max(0.0, timer)
@@ -197,6 +198,7 @@ func _process(delta):
 		close_circle()
 		
 func reset():
+	started = false
 	usernames.shuffle()
 	timer = 20.0
 	size = 0
@@ -229,7 +231,7 @@ func new_inner():
 var busy = false
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func close_circle():
-	if busy || is_done_shrinking():
+	if busy || is_done_shrinking() || !started:
 		return
 	busy = true
 	var t = get_tree().create_tween()

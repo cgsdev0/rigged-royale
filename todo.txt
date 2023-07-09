@@ -3,11 +3,10 @@ requirements
 instructions
 sound effects
 better hover ui
-
 =====================
 stretch goals
 =====================
-cutscene
-
 give sniper
 heal
+
+https://poly.pizza/m/a3XrQkLNna9
