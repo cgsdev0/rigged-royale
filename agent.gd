@@ -4,6 +4,7 @@ var color = Color.HOT_PINK
 var squad = 0
 var pid = 0
 
+var kills = 0
 enum State {
 	IDLE,
 	REGROUPING,
@@ -32,6 +33,7 @@ var greed
 var circle_buffer
 var innate_skill
 var loot_rate
+var tracked = false
 
 func fire_bullet(dist):
 	if loot > 0.1:
@@ -102,7 +104,7 @@ func pick_new_state():
 	if circle_desire > 0.0:
 		desires.push_back([circle_desire, State.CIRCLE])
 	
-	desires.push_back([0.01, State.ROAMING])
+	desires.push_back([0.1, State.ROAMING])
 	# choose a desire
 	var max = 0
 	var chosen = State.IDLE
@@ -201,6 +203,8 @@ func _physics_process(delta):
 	var outside_wall = xy.distance_to(CircleZone.ocp) > CircleZone.ocr
 	if outside_wall:
 		take_damage(delta * CircleZone.size, -1) 
+	
+	if outside_wall || tracked:
 		$CSGSphere3D.material.albedo_color = Color.WHITE
 	else:
 		$CSGSphere3D.material.albedo_color = color
@@ -247,7 +251,10 @@ func _physics_process(delta):
 			if who.squad != squad && !who.dead:
 				var shot_dist = who.global_position.distance_to(global_position)
 				if fire_bullet(shot_dist):
-					loot = min(loot + who.take_damage((loot / 2.0 + 0.5) * 10.0, self.pid), 100.0)
+					var new_loot = who.take_damage((loot / 2.0 + 0.5) * 10.0, self.pid)
+					if new_loot > 0.0:
+						loot = min(loot + new_loot, 100.0)
+						kills += 1
 					var cyl = CSGCylinder3D.new()
 					cyl.radius = 0.5
 					cyl.set_script(preload("res://tracer.gd"))
@@ -288,5 +295,5 @@ func take_damage(how_much, by):
 		$XMarksTheSpot.visible = true
 		$CSGSphere3D.visible = false
 		remove_from_group("player")
-		return loot / 2.0
+		return max(0.01, loot / 2.0)
 	return 0.0

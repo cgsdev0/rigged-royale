@@ -1,13 +1,23 @@
 extends Label
 
 
+var prev
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	prev = ceil(CircleZone.timer)
 	pass # Replace with function body.
-
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	var cur = ceil(CircleZone.timer)
+	if cur < prev && cur < 4:
+		if cur == 0:
+			$DingSound.pitch_scale = 1.55
+		else:
+			$DingSound.pitch_scale = 1.0
+		$DingSound.play()
+			
+	prev = cur
 	var fstr="""BattleOS v20.17
 ====================================
 Players remaining: {0}

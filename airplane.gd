@@ -4,6 +4,9 @@ extends Node3D
 var started = false
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	$CRTSound.play()
+	await $CRTSound.finished
+	$AudioStreamPlayer.play()
 	await get_tree().create_timer(20.0).timeout
 	if !is_instance_valid(self):
 		return

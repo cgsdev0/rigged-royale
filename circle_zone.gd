@@ -160,7 +160,20 @@ var usernames = [
 		"fortniteisbetter",
 		"CHUGJUG",
 		"wherewedroppin",
-		"godotuser"
+		"godotuser",
+		"aryajp",
+		"kuviman",
+		"nertsal",
+		"itsboats",
+		"grumbleofpugz",
+		"practicalnpc",
+		"kepsert",
+		"rincs",
+		"deanoak47",
+		"frankdatank159",
+		"summit4g",
+		"shroudsmurf",
+		"obama"
 ]
 
 var sizes = [
@@ -230,8 +243,11 @@ func new_inner():
 
 var busy = false
 # Called every frame. 'delta' is the elapsed time since the previous frame.
+func can_close():
+	return !(busy || is_done_shrinking() || !started)
+	
 func close_circle():
-	if busy || is_done_shrinking() || !started:
+	if !can_close():
 		return
 	busy = true
 	var t = get_tree().create_tween()

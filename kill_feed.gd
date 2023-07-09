@@ -9,6 +9,7 @@ func _ready():
 	pass # Replace with function body.
 
 func on_kill(who, by):
+	$KillSound.play()
 	lines += 1
 	if lines > 10:
 		lines_skipped += 1

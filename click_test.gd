@@ -28,11 +28,22 @@ var colors = [
 	rgb(132,53,28),
 ]
 
+var sticky = false
 func rgb(r,g,b):
 	return Color(r / 255.0, g / 255.0, b / 255.0)
 
+func _ready():
+	await get_tree().create_timer(2.0).timeout
+	$HumSound.play()
+	$KeyboardSound.play()
+	var tween = get_tree().create_tween()
+	tween.set_parallel()
+	tween.tween_property($HumSound, "volume_db", -5.0, 3.0)
+	tween.tween_property($KeyboardSound, "volume_db", -5.0, 5.0)
+	
 # Called when the node enters the scene tree for the first time.
 func start_the_game():
+	$StaticSound.play()
 	current = true
 	await get_tree().create_timer(0.16).timeout
 	$%Static.visible = false
@@ -113,17 +124,29 @@ func _process(delta):
 	if !current:
 		return
 	if !CircleZone.busy && !CircleZone.is_done_shrinking():
+		var x = 0
+		var y = 0
 		if Input.is_action_pressed("ui_left"):
 			CircleZone.icp.x += delta * 10.0
+			x -= 1
 		if Input.is_action_pressed("ui_right"):
 			CircleZone.icp.x -= delta * 10.0
+			x += 1
 		if Input.is_action_pressed("ui_up"):
 			CircleZone.icp.y += delta * 10.0
+			y -= 1
 		if Input.is_action_pressed("ui_down"):
 			CircleZone.icp.y -= delta * 10.0
+			y += 1
+			
+		if (x or y):
+			if !$WhirSound.playing:
+				$WhirSound.play()
+		else:
+			$WhirSound.stop()
 			
 func _physics_process(delta):
-	if !current:
+	if !current || sticky:
 		return
 	var mp = get_viewport().get_mouse_position()
 	var from = project_ray_origin(mp)
@@ -133,10 +156,9 @@ func _physics_process(delta):
 	var result = get_world_3d().direct_space_state.intersect_ray(query)
 	if result && "collider" in result:
 		var p = result.collider.get_parent()
-		$%UI/Label.text = str(p.pid) + "\nLoot: " + str(p.loot) + "\nHealth: " + str(p.health)
-		$%UI.visible = true
+		$%UI.set_player(p)
 	else:
-		$%UI.visible = false
+		$%UI.untrack()
 #var poi_pending = null
 #var poi = []
 
@@ -147,7 +169,9 @@ func _input(event):
 	if !current:
 		return
 	if event.is_action_pressed("ui_accept"):
-		CircleZone.close_circle()
+		if CircleZone.can_close():
+			$ButtonSound.play()
+			CircleZone.close_circle()
 	if event is InputEventMouseMotion && dragging:
 		var sc = 512.0 / size
 		var bound = (512.0 - size) / 2.0
@@ -169,6 +193,8 @@ func _input(event):
 			elif event.button_index == MOUSE_BUTTON_WHEEL_UP:
 				if size <= 64.0:
 					return
+				if !$ZoomInSound.playing:
+					$ZoomInSound.play()
 				size = max(size / 2.0, 64.0)
 				var from = project_ray_origin(event.position)
 				var to = from + project_ray_normal(event.position) * 1000.0
@@ -178,6 +204,9 @@ func _input(event):
 					global_position.x = result.position.x
 					global_position.z = result.position.z
 			elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+				if size < 512.0:
+					if !$ZoomOutSound.playing:
+						$ZoomOutSound.play()
 				size = min(size * 2, 512.0)
 				if size >= 512.0:
 					global_position.x = 256.0
@@ -185,6 +214,20 @@ func _input(event):
 					return
 		elif event.button_index == MOUSE_BUTTON_LEFT:
 			dragging = false
+			if drag_anchor.distance_to(event.position) < 5.0:
+				# click, not drag (probably lol)
+				var from = project_ray_origin(event.position)
+				var to = from + project_ray_normal(event.position) * 1000.0
+				var query =  PhysicsRayQueryParameters3D.create(from, to, 4)
+				query.collide_with_areas = true
+				var result = get_world_3d().direct_space_state.intersect_ray(query)
+				if result && "position" in result:
+					var p = result.collider.get_parent()
+					$%UI.set_player(p)
+					sticky = true
+				else:
+					$%UI.untrack()
+					sticky = false
 			# released
 			pass
 #		else:

@@ -2,11 +2,23 @@ requirements
 ====================
 instructions
 sound effects
-better hover ui
 =====================
 stretch goals
 =====================
 give sniper
 heal
 
+dust particles
+crt on effect (visual)
+
 https://poly.pizza/m/a3XrQkLNna9
+https://www.freesoundeffects.com/free-track/airplane-6-22396/
+https://freesound.org/people/LimitSnap_Creations/sounds/279004/
+https://freesound.org/people/magedu/sounds/263900/
+https://freesound.org/people/Lewooz/sounds/545952/
+https://freesound.org/people/jesabat/sounds/119739/
+https://freesound.org/people/Supakid13/sounds/210018/
+https://freesound.org/people/earth_cord/sounds/635915/
+https://freesound.org/people/jivatma07/sounds/76234/
+https://freesound.org/people/soundslikewillem/sounds/193972/
+https://freesound.org/people/tim.kahn/sounds/91926/
