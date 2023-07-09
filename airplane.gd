@@ -6,6 +6,7 @@ var started = false
 func _ready():
 	await get_tree().create_timer(1.0).timeout
 	$CRTSound.play()
+	$CRTSound2.play()
 	await $CRTSound.finished
 	$AudioStreamPlayer.play()
 	await get_tree().create_timer(20.0).timeout
@@ -23,7 +24,7 @@ func _input(event):
 			$%GameCam.start_the_game()
 			queue_free()
 			
-var fade = -2.6
+var fade = -3.4
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	fade += delta * 2.0
