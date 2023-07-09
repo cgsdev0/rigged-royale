@@ -1,3 +1,5 @@
+requirements
+====================
 pan the camera with mouse
 make the tracers disappear
 
@@ -5,4 +7,10 @@ better font
 sound effects
 better hover ui
 
+=====================
+stretch goals
+=====================
 cutscene
+
+give sniper
+heal

@@ -189,7 +189,7 @@ signal killed(who, by)
 var timer
 
 func _process(delta):
-	if busy:
+	if busy || is_done_shrinking():
 		return
 	timer -= delta
 	timer = max(0.0, timer)
@@ -217,6 +217,7 @@ func is_done_shrinking():
 	
 func new_inner():
 	if size >= sizes.size():
+		size += 1
 		return
 		
 	var r = sizes[size] / 2.0

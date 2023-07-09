@@ -106,7 +106,7 @@ func pan_dist():
 	return 512.0 / size
 	
 func _process(delta):
-	if !CircleZone.busy:
+	if !CircleZone.busy && !CircleZone.is_done_shrinking():
 		if Input.is_action_pressed("ui_left"):
 			CircleZone.icp.x += delta * 10.0
 		if Input.is_action_pressed("ui_right"):
