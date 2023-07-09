@@ -106,14 +106,16 @@ func pan_dist():
 	return 512.0 / size
 	
 func _process(delta):
-	if Input.is_action_pressed("ui_left"):
-		CircleZone.icp.x += delta * 10.0
-	if Input.is_action_pressed("ui_right"):
-		CircleZone.icp.x -= delta * 10.0
-	if Input.is_action_pressed("ui_up"):
-		CircleZone.icp.y += delta * 10.0
-	if Input.is_action_pressed("ui_down"):
-		CircleZone.icp.y -= delta * 10.0
+	if !CircleZone.busy:
+		if Input.is_action_pressed("ui_left"):
+			CircleZone.icp.x += delta * 10.0
+		if Input.is_action_pressed("ui_right"):
+			CircleZone.icp.x -= delta * 10.0
+		if Input.is_action_pressed("ui_up"):
+			CircleZone.icp.y += delta * 10.0
+		if Input.is_action_pressed("ui_down"):
+			CircleZone.icp.y -= delta * 10.0
+			
 func _physics_process(delta):
 	var mp = get_viewport().get_mouse_position()
 	var from = project_ray_origin(mp)

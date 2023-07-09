@@ -190,7 +190,7 @@ func _physics_process(delta):
 	var xy = Vector2(global_position.x, global_position.z)
 	var outside_wall = xy.distance_to(CircleZone.ocp) > CircleZone.ocr
 	if outside_wall:
-		take_damage(delta * CircleZone.size) 
+		take_damage(delta * CircleZone.size, -1) 
 	
 	# check if we should change state
 	state = pick_new_state()
@@ -233,7 +233,7 @@ func _physics_process(delta):
 			if who.squad != squad:
 				var shot_dist = who.global_position.distance_to(global_position)
 				if fire_bullet(shot_dist):
-					loot = min(loot + who.take_damage((loot / 2.0 + 0.5) * 10.0), 100.0)
+					loot = min(loot + who.take_damage((loot / 2.0 + 0.5) * 10.0, self.pid), 100.0)
 					var cyl = CSGCylinder3D.new()
 					cyl.radius = 0.5
 					get_parent().add_child(cyl)
@@ -260,11 +260,12 @@ func _physics_process(delta):
 		
 	global_position += velocity * delta
 
-func take_damage(how_much):
-	print(pid, " TOOK ", how_much, " DAMAGE")
+func take_damage(how_much, by):
+	#print(pid, " TOOK ", how_much, " DAMAGE")
 	health -= how_much
 	if health <= 0.0:
 		CircleZone.kill(squad)
+		CircleZone.emit_signal("killed", self.pid, by)
 		queue_free()
 		return loot / 2.0
 	return 0.0

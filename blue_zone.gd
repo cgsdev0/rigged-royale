@@ -16,6 +16,11 @@ func _process(delta):
 	var p
 	var r
 	if inner:
+		if CircleZone.busy || CircleZone.is_done_shrinking():
+			visible = false
+			return
+		else:
+			visible = true
 		p = CircleZone.icp
 		r = CircleZone.icr
 	else:
