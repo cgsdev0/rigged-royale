@@ -1,14 +1,12 @@
-requirements
-====================
-=====================
-stretch goals
-=====================
-
-dust particles
-crt on effect (visual)
-
+Art:
 https://github.com/cgcostume/pubg-maps
 https://poly.pizza/m/a3XrQkLNna9
+
+Code:
+https://godotshaders.com/shader/crt-shader-2/
+https://godotengine.org/
+
+Audio:
 https://www.freesoundeffects.com/free-track/airplane-6-22396/
 https://freesound.org/people/LimitSnap_Creations/sounds/279004/
 https://freesound.org/people/magedu/sounds/263900/
