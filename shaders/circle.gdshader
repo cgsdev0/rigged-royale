@@ -16,5 +16,4 @@ vec3 blue(vec3 color)
 void fragment() {
     ALBEDO = textureLod(screen_texture, SCREEN_UV, 0.0).rgb;
 	ALBEDO = mix(ALBEDO, blue(ALBEDO), sign(distance(UV, position) - radius) / 2.0 + 0.5);
-	SPECULAR = 0.0;
 }

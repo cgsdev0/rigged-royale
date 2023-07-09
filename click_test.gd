@@ -36,14 +36,26 @@ func _ready():
 	self.call_deferred("spawn_pois")
 #	return
 	self.call_deferred("spawn")
+	#self.call_deferred("visual_circle")
 	
 var pois = [{ "p": Vector3(436.9383, 51.37256, -79.0124), "r": 10.194164276123 }, { "p": Vector3(399.0123, 49.29999, -160.3951), "r": 38.2107048034668 }, { "p": Vector3(365.8271, 50.5882, -256), "r": 21.9142971038818 }, { "p": Vector3(285.2346, 57.25488, -256.7901), "r": 24.1878223419189 }, { "p": Vector3(261.5309, 50.5882, -183.3087), "r": 15.3686218261719 }, { "p": Vector3(233.8765, 50.76251, -198.321), "r": 20.7475280761719 }, { "p": Vector3(171.4568, 50.19608, -152.4938), "r": 29.6597595214844 }, { "p": Vector3(154.0741, 100, -80.59259), "r": 12.5365800857544 }, { "p": Vector3(56.88889, 55.29407, -271.8024), "r": 19.6829319000244 }, { "p": Vector3(134.321, 50.5882, -299.4568), "r": 18.5297794342041 }, { "p": Vector3(229.9259, 50.19608, -402.963), "r": 48.5714302062988 }, { "p": Vector3(130.3704, 50.19608, -382.4197), "r": 23.4825611114502 }, { "p": Vector3(414.8148, 50.19608, -385.5803), "r": 24.5991859436035 }, { "p": Vector3(271.8025, 50.19608, -80.59261), "r": 22.6700191497803 }]
 
+func visual_circle():
+	var cyl = CSGCylinder3D.new()
+	cyl.radius = CircleZone.icr
+	cyl.height = 50.0
+	get_parent().add_child(cyl)
+	cyl.global_position.x = CircleZone.icp.x
+	cyl.global_position.z = CircleZone.icp.y
+	cyl.sides = 128
+	cyl.global_position.y = 50.0
+	
 func spawn_pois():
 	for poi in pois:
 		var cyl = CSGCylinder3D.new()
 		cyl.radius = poi.r
 		cyl.height = 50.0
+		cyl.visible = false
 		get_parent().add_child(cyl)
 		cyl.global_position = poi.p
 		cyl.add_to_group("loot")
@@ -59,8 +71,8 @@ func spawn():
 		var p = player_scene.instantiate()
 		p.pid = i
 		get_parent().add_child(p)
-		var idx = randi_range(0, $%NavigationRegion3D.navigation_mesh.get_polygon_count())
-		var v = $%NavigationRegion3D.navigation_mesh.get_vertices()[$%NavigationRegion3D.navigation_mesh.get_polygon(idx)[1]]
+		var idx = randi_range(0, $%NavigationRegion3D.navigation_mesh.get_polygon_count() - 1)
+		var v = $%NavigationRegion3D.navigation_mesh.get_vertices()[$%NavigationRegion3D.navigation_mesh.get_polygon(idx)[0]]
 		p.global_position = v
 	
 	var squad_id = 0
@@ -93,11 +105,33 @@ func spawn():
 func pan_dist():
 	return 512.0 / size
 	
+func _process(delta):
+	if Input.is_action_pressed("ui_left"):
+		CircleZone.icp.x += delta * 10.0
+	if Input.is_action_pressed("ui_right"):
+		CircleZone.icp.x -= delta * 10.0
+	if Input.is_action_pressed("ui_up"):
+		CircleZone.icp.y += delta * 10.0
+	if Input.is_action_pressed("ui_down"):
+		CircleZone.icp.y -= delta * 10.0
+func _physics_process(delta):
+	var mp = get_viewport().get_mouse_position()
+	var from = project_ray_origin(mp)
+	var to = from + project_ray_normal(mp) * 1000.0
+	var query =  PhysicsRayQueryParameters3D.create(from, to, 4)
+	query.collide_with_areas = true
+	var result = get_world_3d().direct_space_state.intersect_ray(query)
+	if result && "collider" in result:
+		var p = result.collider.get_parent()
+		$%UI/Label.text = str(p.pid) + "\nLoot: " + str(p.loot) + "\nHealth: " + str(p.health)
+		$%UI.visible = true
+	else:
+		$%UI.visible = false
 #var poi_pending = null
 #var poi = []
 func _input(event):
-#	if event.is_action_pressed("ui_accept"):
-#		print(poi)
+	if event.is_action_pressed("ui_accept"):
+		CircleZone.close_circle()
 	if event is InputEventMouseButton:
 		if event.is_pressed():
 			if event.button_index == MOUSE_BUTTON_LEFT:

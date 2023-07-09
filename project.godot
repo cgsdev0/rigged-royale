@@ -19,7 +19,14 @@ config/icon="res://icon.svg"
 
 CircleZone="*res://circle_zone.gd"
 
+[display]
+
+window/size/viewport_width=960
+window/stretch/mode="canvas_items"
+window/defaults/default_clear_color=Color(0.00784314, 0.00784314, 0.00784314, 1)
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.00784314, 0.00784314, 0.00784314, 1)
