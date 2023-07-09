@@ -1,14 +1,12 @@
 [gd_scene load_steps=5 format=3 uid="uid://brml41mtakn5m"]
 
 [ext_resource type="Script" path="res://agent.gd" id="1_83jwu"]
+[ext_resource type="Material" uid="uid://c3u7aiuefmkbn" path="res://materials/tracer.tres" id="2_rlqt4"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rixvl"]
 resource_local_to_scene = true
 shading_mode = 0
 albedo_color = Color(1, 0, 1, 1)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qcdq8"]
-shading_mode = 0
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_fmo2e"]
 radius = 4.0
@@ -25,10 +23,17 @@ max_neighbors = 20
 radius = 2.0
 material = SubResource("StandardMaterial3D_rixvl")
 
-[node name="CSGSphere3D2" type="CSGSphere3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.76526, 0)
-radius = 1.3
-material = SubResource("StandardMaterial3D_qcdq8")
+[node name="XMarksTheSpot" type="Node3D" parent="."]
+
+[node name="CSGBox3D" type="CSGBox3D" parent="XMarksTheSpot"]
+transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 0, 0.765, 0)
+size = Vector3(3, 0.7, 0.7)
+material = ExtResource("2_rlqt4")
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="XMarksTheSpot"]
+transform = Transform3D(-0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, -0.707107, 0, 0.765024, 0)
+size = Vector3(3, 0.7, 0.7)
+material = ExtResource("2_rlqt4")
 
 [node name="RigidBody3D" type="Area3D" parent="."]
 collision_layer = 4

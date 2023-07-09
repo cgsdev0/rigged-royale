@@ -1,9 +1,6 @@
 requirements
 ====================
-pan the camera with mouse
-make the tracers disappear
-
-better font
+instructions
 sound effects
 better hover ui
 

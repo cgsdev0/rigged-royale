@@ -229,7 +229,7 @@ func new_inner():
 var busy = false
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func close_circle():
-	if busy:
+	if busy || is_done_shrinking():
 		return
 	busy = true
 	var t = get_tree().create_tween()

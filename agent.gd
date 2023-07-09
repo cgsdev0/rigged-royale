@@ -8,8 +8,7 @@ enum State {
 	IDLE,
 	REGROUPING,
 	LOOTING,
-	ENGAGING,
-	FLEEING,
+	ROAMING,
 	CIRCLE
 }
 var state = State.IDLE
@@ -18,6 +17,7 @@ var debouncer = 0.0
 
 var scan_angle = 0
 
+var dead = false
 # stats
 var health = 100.0
 var loot = 0.0
@@ -101,6 +101,8 @@ func pick_new_state():
 		circle_desire = (xy.distance_to(CircleZone.icp) - CircleZone.icr + circle_buffer) * 10000.0
 	if circle_desire > 0.0:
 		desires.push_back([circle_desire, State.CIRCLE])
+	
+	desires.push_back([0.01, State.ROAMING])
 	# choose a desire
 	var max = 0
 	var chosen = State.IDLE
@@ -172,7 +174,15 @@ func within_loot_area():
 			return true
 	return false
 	
+func random_inner_circle():
+	var r = randf_range(0.0, CircleZone.icr)
+	var theta = randf_range(0.0, 2 * PI)
+	return Vector3(CircleZone.icp.x, global_position.y, CircleZone.icp.z) + Vector3(cos(theta) * r, 0.0, sin(theta) * r)
+	
 func _physics_process(delta):
+	if dead:
+		return
+		
 	if global_position.x > 512.0:
 		print("HELP I AM LOST")
 	if global_position.x < 0:
@@ -191,6 +201,9 @@ func _physics_process(delta):
 	var outside_wall = xy.distance_to(CircleZone.ocp) > CircleZone.ocr
 	if outside_wall:
 		take_damage(delta * CircleZone.size, -1) 
+		$CSGSphere3D.material.albedo_color = Color.WHITE
+	else:
+		$CSGSphere3D.material.albedo_color = color
 	
 	# check if we should change state
 	state = pick_new_state()
@@ -203,7 +216,6 @@ func _physics_process(delta):
 			if within_loot_area():
 				loot = min(loot + delta * loot_rate, 100.0)
 		
-	$CSGSphere3D2.visible = outside_wall
 	# do things on transitions
 	if state != prev_state:
 		debouncer = 0.0
@@ -215,6 +227,8 @@ func _physics_process(delta):
 				plot_course(find_nearby_loot())
 			State.CIRCLE:
 				plot_course(CircleZone.ocp)
+			State.ROAMING:
+				plot_course(random_inner_circle())
 			
 	
 	# sweep the horizons
@@ -230,12 +244,13 @@ func _physics_process(delta):
 			if result.collider.collision_layer == 2:
 				continue
 			var who = result.collider.get_parent()
-			if who.squad != squad:
+			if who.squad != squad && !who.dead:
 				var shot_dist = who.global_position.distance_to(global_position)
 				if fire_bullet(shot_dist):
 					loot = min(loot + who.take_damage((loot / 2.0 + 0.5) * 10.0, self.pid), 100.0)
 					var cyl = CSGCylinder3D.new()
 					cyl.radius = 0.5
+					cyl.set_script(preload("res://tracer.gd"))
 					get_parent().add_child(cyl)
 					cyl.global_position = (who.global_position + global_position) / 2.0
 					cyl.height = shot_dist
@@ -261,11 +276,17 @@ func _physics_process(delta):
 	global_position += velocity * delta
 
 func take_damage(how_much, by):
+	if dead:
+		return
 	#print(pid, " TOOK ", how_much, " DAMAGE")
 	health -= how_much
 	if health <= 0.0:
 		CircleZone.kill(squad)
 		CircleZone.emit_signal("killed", self.pid, by)
-		queue_free()
+		dead = true
+		global_rotation = Vector3.ZERO
+		$XMarksTheSpot.visible = true
+		$CSGSphere3D.visible = false
+		remove_from_group("player")
 		return loot / 2.0
 	return 0.0

@@ -9,3 +9,4 @@ func _ready():
 
 func on_win():
 	visible = true
+	$AnimationPlayer.play("flash")

@@ -131,17 +131,26 @@ func _physics_process(delta):
 		$%UI.visible = false
 #var poi_pending = null
 #var poi = []
+
+var dragging = false
+var drag_anchor
+var drag_pos
 func _input(event):
 	if event.is_action_pressed("ui_accept"):
 		CircleZone.close_circle()
+	if event is InputEventMouseMotion && dragging:
+		var sc = 512.0 / size
+		var bound = (512.0 - size) / 2.0
+		global_position.x = (event.position.x - drag_anchor.x) / sc + drag_pos.x
+		global_position.z = (event.position.y - drag_anchor.y) / sc + drag_pos.z
+		global_position.x = min(max(global_position.x, 256.0 - bound), 256.0 + bound)
+		global_position.z = min(max(global_position.z, -256.0 - bound), -256.0 + bound)
 	if event is InputEventMouseButton:
 		if event.is_pressed():
 			if event.button_index == MOUSE_BUTTON_LEFT:
-				var from = project_ray_origin(event.position)
-				var to = from + project_ray_normal(event.position) * 1000.0
-				var query =  PhysicsRayQueryParameters3D.create(from, to)
-				query.collide_with_areas = true
-				var result = get_world_3d().direct_space_state.intersect_ray(query)
+				dragging = true
+				drag_anchor = event.position
+				drag_pos = global_position
 #				if result && "position" in result:
 ##					poi_pending = result.position
 ##					return
@@ -155,7 +164,7 @@ func _input(event):
 				var to = from + project_ray_normal(event.position) * 1000.0
 				var query =  PhysicsRayQueryParameters3D.create(from, to)
 				var result = get_world_3d().direct_space_state.intersect_ray(query)
-				if result && "position" in result:
+				if result && "position" in result && !dragging:
 					global_position.x = result.position.x
 					global_position.z = result.position.z
 			elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
@@ -164,6 +173,10 @@ func _input(event):
 					global_position.x = 256.0
 					global_position.z = -256.0
 					return
+		elif event.button_index == MOUSE_BUTTON_LEFT:
+			dragging = false
+			# released
+			pass
 #		else:
 #			if event.button_index == MOUSE_BUTTON_LEFT:
 #				var from = project_ray_origin(event.position)
