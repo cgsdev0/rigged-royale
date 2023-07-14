@@ -38,7 +38,7 @@ var tracked = false
 
 var cooldown = 0.0
 
-func fire_bullet(dist):
+func fire_bullet(dist: float):
 	if cooldown > 0.0:
 		return false
 	if loot > 0.1:
